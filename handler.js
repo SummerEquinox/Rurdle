@@ -81,6 +81,7 @@ const Database = ["apple", "baker", "cabin", "dance", "eager", "faith", "giant",
 "kneel", "leapt", "mince", "nymph", "optic", "plume", "quilt", "rouse",
 "sheep", "tread", "urban", "vivid", "whisk", "xenon", "yield", "zonal",
 "apart", "brick"];
+// ->> The list will be moved into an external file in the future.
 
 // Variables
 let attemptedGuesses = 0;
@@ -125,41 +126,58 @@ function attemptCompleteGuessOnEnter()
     submittedWord = submittedWord.toLowerCase();
 
     var wordIsCorrect = false;
+    var usedIndexes = [false, false, false, false, false];
     var frequencies = {};
+    
+    //
+    // Letter Color Logic Section
 
-    // first iteration set, collect frequencies of letters.
-    for (i = 0 ; i < submittedWord.length ; i++) {
-        if (frequencies[chosenWord[i]] === undefined) {
-            frequencies[chosenWord[i]] = 1;
+    if (submittedWord === chosenWord) { wordIsCorrect = true; }
+
+    for (subLetter = 0 ; subLetter < 5 ; subLetter++){ // collect letter frequencies
+        if (frequencies[chosenWord[subLetter]] === undefined){
+            frequencies[chosenWord[subLetter]] = 1;
         }
         else {
-            frequencies[chosenWord[i]] += 1;
-        }
-    }
-    
-    // second iteration set, mark green letters and subtract.
-    for (i = 0 ; i < submittedWord.length ; i++){
-        if (!(submittedWord[i] in frequencies)) { continue; }
-        if (submittedWord[i] == chosenWord[i]){
-            frequencies[submittedWord[i]]--;
-            document.getElementById(String(i)).style.backgroundColor = colorSet.green;
+            frequencies[chosenWord[subLetter]]++;
         }
     }
 
-    // third iteration set, mark yellow letters and subtract, also mark reds.
-    for (i = 0 ; i < submittedWord.length ; i++){
-        if (!(submittedWord[i] in frequencies)) { 
-            document.getElementById(String(i)).style.backgroundColor = colorSet.red;
-            continue; 
+    for (subLetter = 0 ; subLetter < 5 ; subLetter++){ // mark green letters
+        if (submittedWord[subLetter] == chosenWord[subLetter]){
+            usedIndexes[subLetter] = true;
+            frequencies[chosenWord[subLetter]]--;
+            document.getElementById(String(subLetter)).style.backgroundColor = colorSet.green;
+            continue;
         }
-        if (document.getElementById(String(i)).style.backgroundColor == colorSet.green) { continue; }
-        if ((frequencies[submittedWord[i]]) == 0) { continue; }
-
-        document.getElementById(String(i)).style.backgroundColor = colorSet.yellow;
     }
+
+    for (subLetter = 0 ; subLetter < 5 ; subLetter++){ // mark yellow letters
+        if (usedIndexes[subLetter] == true) { continue; }
+        if (frequencies[chosenWord[subLetter]] === undefined) { continue; }
+
+        for (subsubLetter = 0 ; subsubLetter < 5 ; subsubLetter++){
+            if (usedIndexes[subLetter] == true && document.getElementById(String(subLetter)).style.backgroundColor == colorSet.green) { continue; }
+            if (frequencies[submittedWord[subLetter]] == 0) { continue; }
+            if (chosenWord[subsubLetter] == submittedWord[subLetter]){
+                usedIndexes[subLetter] = true;
+                frequencies[submittedWord[subLetter]]--;
+                document.getElementById((subLetter)).style.backgroundColor = colorSet.yellow;
+                break;
+            }
+        }
+    }
+
+    for (subLetter = 0 ; subLetter < 5 ; subLetter++){ // mark red letters
+        if (usedIndexes[subLetter] == true) { continue; }
+        document.getElementById(String(subLetter)).style.backgroundColor = colorSet.red;
+    }
+
+    // End Letter Color Logic Section
+    //
 
     if (wordIsCorrect){
-        console.log("Word is correct!");
+        confirm("You guessed the word correctly! Congratulations!")
     } else {
         var firstLet = document.getElementById('0');
         var secondLet = document.getElementById('1');
