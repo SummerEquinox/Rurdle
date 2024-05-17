@@ -124,6 +124,12 @@ function attemptCompleteGuessOnEnter()
     if ( submittedWord === null ) { return; }
 
     submittedWord = submittedWord.toLowerCase();
+    attemptedGuesses++;
+
+    if (attemptedGuesses == 2){
+        document.getElementById("main-header").innerHTML = "";
+        document.getElementById("game-desc").innerHTML = "";
+    }
 
     var wordIsCorrect = false;
     var usedIndexes = [false, false, false, false, false];
